@@ -54,7 +54,7 @@ style: |
 ---
 
 # <h1 class="title">厳格になるPHPと<br>リファクタリング</h1>
-# <h1 class="sabtitle">― 注意点とポイント ―</h1>
+
 
 <!-- _paginate: false -->
 <div class="author">
@@ -81,11 +81,11 @@ style: |
 <!-- paginate: true -->
 ---
 
-## アジェンダ
+## 今回のはなし
 
 - <span style="font-size: 50px">最近のPHPで注意するポイント</span>
 <br>
-- <span style="font-size: 50px">リファクタリングしなかったときの問題点</span>
+- <span style="font-size: 50px">リファクタリングを先送りしときの課題</span>
 
 
 ---
@@ -104,13 +104,17 @@ style: |
 
 ---
 
-## 最近のPHPの動向 - ピックアップ -
+## 最近のPHPの動向 <span class="subtitle">- ピックアップ -</span>
 
 - PHP7.4：プロパティ型指定の導入
 - PHP8.0：match式の導入／<span style="color: red;">緩やかな比較演算子の挙動変更</span>
 - PHP8.1：列挙型・交差型・Readonlyアクセス修飾子の導入
 - PHP8.2：null型・false型・true型の導入／<span style="color: red;">動的プロパティ禁止</span>
 - ～PHP9：<span style="color: red;">未定義変数のアクセス禁止<span>
+
+⇒ 型に関する変更／追加が多数
+
+<span style="position: absolute; bottom: 100px; right:50px;font-size:30px;color:red;">※下位互換性のない変更点<span>
 
 ---
 
@@ -121,7 +125,7 @@ style: |
 PHPでもたくさん型指定していいってこと？
 </span>
 
-<span style="position: absolute; bottom: 100px;right: 60px;">これから毎日、型宣言 しようぜ？</span>
+<span style="font-size: 30px;position: absolute; bottom: 100px;right: 60px;">これから毎日、型宣言 しようぜ？</span>
 
 
 ---
@@ -182,7 +186,7 @@ Fatal error: Uncaught TypeError: must be of type string, null given...
 <br>
 - 型を指定しないと特にエラーとならない
 <br>
-⇒ ゆるふわな挙動と厳格な挙動が混在する状態が作れる
+⇒ ゆるふわな挙動と厳格な挙動が混在する状態が作れてしまう
 
 ---
 
@@ -201,16 +205,21 @@ Fatal error: Uncaught TypeError: must be of type string, null given...
 
 ---
 
-## 厳密な書き方しなくてもいいのでは？
+## リファクタリングの先送り
 
-型指定するのに注意がいるし・・・。
-<br>
-→ 問題がおきるまでそのまま使おう！
 
+型指定するのに注意がいるし...。
+他の開発もあるし...。
+
+→ 厳密な書き方しなくてもいいのでは？
+<br><br>
+<div style="font-size: 50px">⇒ 修正を先送りに...</div>
+
+<span style="font-size: 30px;position: absolute; bottom: 100px;right: 60px;">そして...バージョンアップがやってくる</span>
 
 --- 
 
-## 問題発生 <span class="subtitle">-PHP8バージョンアップ-</span>
+## PHPバージョンアップ <span class="subtitle">-PHP8-</span>
 
 1. <span style="color: red;">いくつかの下位互換性のない変更</span>
    - やかな比較演算子の挙動変更
@@ -226,7 +235,6 @@ Fatal error: Uncaught TypeError: must be of type string, null given...
 
 「==」などの演算子において文字列と数値の比較結果が一部変更
 ※厳密な比較演算子「===」がある
-
 <table
 style="
 border-collapse: collapse;
@@ -234,11 +242,14 @@ border-collapse: collapse;
 background: none;
       font-size: 25px;
       text-align: center;
-      width: 50%;">
+      width: 50%;
+      margin-left: auto;
+    margin-right: auto;
+      ">
     <tr><th>条件式</th><th>7.x</th><th> 8.x</th></tr>
     <tr><td>0 == "0"</td><td >TRUE</td><td>TRUE</td></tr>
     <tr><td> 0 == "0.0"</td><td >TRUE</td><td>TRUE</td></tr>
-    <tr><td> 0 == "foo"</td><td >TRUE</td><td style="color: orange;">FALSE</td></tr>
+    <tr><td> 0 == "foo"</td><td >TRUE</td><td style="color: red;">FALSE</td></tr>
     <tr ><td style="
     border-left-color: red;
     border-top-color: red;
@@ -248,22 +259,21 @@ background: none;
      <td style="
     border-top-color: red;
     border-bottom-color: red;
-     border-width: 5px 1px 5px 1px;
-     "
+     border-width: 5px 1px 5px 1px;"
      >TRUE</td><td style="
-     color: orange;
+     color: red;
          border-right-color: red;
     border-top-color: red;
     border-bottom-color: red;
      border-width: 5px 5px 5px 1px;
      ">FALSE</td></tr>
-    <tr><td>42 == "42"</td><td>TRUE</td><td>FALSE</td></tr>
-    <tr><td> 42 == "42foo"</td><td>TRUE</td><td style="color: orange;">FALSE</td></tr>
+    <tr><td>42 == "42"</td><td>TRUE</td><td>TRUE</td></tr>
+    <tr><td> 42 == "42foo"</td><td>TRUE</td><td style="color: red;">FALSE</td></tr>
   </table>
 
 --- 
 
-## 問題発生 <span class="subtitle">-PHP8バージョンアップ-</span>
+## PHPバージョンアップ <span class="subtitle">-PHP8-</span>
 
 1. いくつかの下位互換性のない変更
    - やかな比較演算子の挙動変更
@@ -272,7 +282,6 @@ background: none;
 
 
 2. <span style="color: red;">10年以上のレガシーシステム</span>
-
 
 
 ---
@@ -287,25 +296,31 @@ background: none;
 </span>
 
 <span style="position: absolute; bottom: 100px; right:50px;font-size:30px">
-なんとか対応しリリース...（リリース後は特に大きな問題はなし）
+※なんとか対応しリリース（リリース後は特に大きな問題はなし）
 </span>
 
 ---
 
-## まったく対応しない場合のデメリット
+## 先送りしたときにおきる課題
 
-- 修正範囲が膨大になり、修正コスト大
-- EOLがあるため、時間的制限が発生
+- 型指定がないコードを修正しない
+  - 調査が大変（呼び出し箇所などをすべて確認するなど）
+  - 問題のあるコードが複製される
+
+- 警告ログなどを修正しない
+  - PHPのバージョンアップ時のコスト大
+  - 修正範囲が膨大になり、修正コスト大
+
 
 
 ---
 
 ## チームで実施
 
-- 差分ファイルの、静的解析で問題があったコードは必ず修正
+- 差分ファイルの、静的解析で問題があった箇所は必ず修正
 (PhpStormの静的解析などを利用)
 
-- ログから警告エラーを調査/監視し対象コードは逐次修正
+- ログから警告エラーを調査/監視し見つかった箇所は逐次修正
 
 ## 個人的に実施
 
